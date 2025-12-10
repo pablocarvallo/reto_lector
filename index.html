@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reto de Lectura</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mi Reto">
+    <meta name="theme-color" content="#FF9A9E">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3389/3389081.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #FF9A9E;
+            --secondary: #FECFEF;
+            --accent: #A18CD1;
+            --success: #84FAB0;
+            --text: #555;
+            --card-bg: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none; /* Evita seleccionar texto al tocar */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text);
+        }
+
+        /* Contenedor Principal */
+        .app-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0px #fff;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: #777;
+        }
+
+        /* Barra de Progreso */
+        .progress-container {
+            background-color: #eee;
+            border-radius: 20px;
+            height: 30px;
+            width: 100%;
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 2px solid #fff;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #fad0c4 0%, #ffd1ff 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Lista de Libros */
+        .book-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .book-item {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .book-item:active {
+            transform: scale(0.98);
+        }
+
+        .book-item.completed {
+            background: #f0fff4;
+            border-color: var(--success);
+        }
+
+        .book-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .book-text {
+            flex-grow: 1;
+            text-align: left;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .check-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .book-item.completed .check-circle {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        /* Sección del Premio */
+        .prize-section {
+            display: none; /* Oculto por defecto */
+            margin-top: 30px;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .prize-section.visible {
+            display: block;
+        }
+
+        .prize-img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.3);
+            border: 4px solid #fff;
+            margin-bottom: 15px;
+        }
+
+        .congrats-text {
+            color: #FF6B6B;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* Botón Reset */
+        .reset-btn {
+            margin-top: 50px;
+            background: none;
+            border: 2px solid #ddd;
+            color: #aaa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: inherit;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .reset-btn:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <h1>📚 Reto de Lectura</h1>
+        <p class="subtitle">¡Lee 3 libros para ganar tu premio!</p>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+
+        <div class="book-list">
+            <div class="book-item" onclick="toggleBook(0)">
+                <span class="book-icon">📕</span>
+                <span class="book-text">Libro 1</span>
+                <div class="check-circle" id="check0"></div>
+            </div>
+            <div class="book-item" onclick="toggleBook(1)">
+                <span class="book-icon">📗</span>
+                <span class="book-text">Libro 2</span>
+                <div class="check-circle" id="check1"></div>
+            </div>
+            <div class="book-item" onclick="toggleBook(2)">
+                <span class="book-icon">📘</span>
+                <span class="book-text">Libro 3</span>
+                <div class="check-circle" id="check2"></div>
+            </div>
+        </div>
+
+        <div class="prize-section" id="prizeSection">
+            <div class="congrats-text">🎉 ¡FELICIDADES! 🎉</div>
+            <p>¡Te ganaste tu iPhone 12!</p>
+            <img src="premio.jpg" alt="iPhone 12" class="prize-img" onerror="this.src='https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-purple-select-2021?wid=470&hei=556&fmt=jpeg&qlt=95&.v=1617130317654'">
+        </div>
+
+        <button class="reset-btn" onclick="resetProgress()">Reiniciar Reto</button>
+    </div>
+
+    <script>
+        // Estado inicial
+        let books = [false, false, false];
+
+        // Al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            updateUI();
+        });
+
+        function toggleBook(index) {
+            // Cambiar estado
+            books[index] = !books[index];
+            saveState();
+            updateUI();
+            
+            // Animación pequeña si se marca
+            if(books[index]) {
+                confetti({
+                    particleCount: 30,
+                    spread: 50,
+                    origin: { y: 0.7 },
+                    colors: ['#84FAB0', '#8FD3F4']
+                });
+            }
+        }
+
+        function updateUI() {
+            // Actualizar lista visual
+            books.forEach((isRead, index) => {
+                const item = document.querySelectorAll('.book-item')[index];
+                const check = document.getElementById(`check${index}`);
+                
+                if (isRead) {
+                    item.classList.add('completed');
+                    check.innerHTML = '✔';
+                } else {
+                    item.classList.remove('completed');
+                    check.innerHTML = '';
+                }
+            });
+
+            // Actualizar Barra de Progreso
+            const readCount = books.filter(b => b).length;
+            const percentage = (readCount / 3) * 100;
+            const progressBar = document.getElementById('progressBar');
+            
+            progressBar.style.width = percentage + '%';
+            progressBar.innerText = readCount > 0 ? Math.round(percentage) + '%' : '';
+
+            // Verificar si ganó
+            const prizeSection = document.getElementById('prizeSection');
+            if (readCount === 3) {
+                if (!prizeSection.classList.contains('visible')) {
+                    celebrate();
+                }
+                prizeSection.classList.add('visible');
+            } else {
+                prizeSection.classList.remove('visible');
+            }
+        }
+
+        function celebrate() {
+            // Confeti explosivo
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#FF9A9E', '#FECFEF', '#A18CD1']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#FF9A9E', '#FECFEF', '#A18CD1']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+        function saveState() {
+            localStorage.setItem('readingChallenge2024', JSON.stringify(books));
+        }
+
+        function loadState() {
+            const saved = localStorage.getItem('readingChallenge2024');
+            if (saved) {
+                books = JSON.parse(saved);
+            }
+        }
+
+        function resetProgress() {
+            if(confirm('¿Seguro quieres reiniciar el reto? Se borrará el avance.')) {
+                books = [false, false, false];
+                saveState();
+                updateUI();
+            }
+        }
+    </script>
+</body>
+</html>
