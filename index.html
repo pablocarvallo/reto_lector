@@ -2,17 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Reto de Lectura</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Mi Reto">
     <meta name="theme-color" content="#FF9A9E">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3389/3389081.png">
 
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -27,7 +25,7 @@
 
         * {
             box-sizing: border-box;
-            user-select: none; /* Evita seleccionar texto al tocar */
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -40,59 +38,59 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center; /* Centrado vertical en pantalla grande */
             color: var(--text);
+            overflow-x: hidden;
         }
 
         /* Contenedor Principal */
         .app-container {
             width: 100%;
-            max-width: 500px;
-            background: rgba(255, 255, 255, 0.8);
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(10px);
-            border-radius: 25px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 30px;
+            padding: 30px 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
-            margin-top: 20px;
         }
 
         h1 {
             color: var(--accent);
             font-size: 2rem;
-            margin-bottom: 10px;
-            text-shadow: 1px 1px 0px #fff;
+            margin: 0 0 10px 0;
         }
 
         p.subtitle {
             font-size: 1.1rem;
             margin-bottom: 30px;
-            color: #777;
+            color: #888;
         }
 
         /* Barra de Progreso */
         .progress-container {
             background-color: #eee;
             border-radius: 20px;
-            height: 30px;
+            height: 25px;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
             overflow: hidden;
-            border: 2px solid #fff;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
-            position: relative;
+            border: 3px solid #fff;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.08);
         }
 
         .progress-bar {
             background: linear-gradient(90deg, #fad0c4 0%, #ffd1ff 100%);
             height: 100%;
             width: 0%;
-            transition: width 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efecto rebote */
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #fff;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 0.9rem;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
@@ -100,109 +98,128 @@
         .book-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            width: 100%;
+            gap: 18px;
         }
 
         .book-item {
             background: var(--card-bg);
-            border-radius: 15px;
-            padding: 15px;
+            border-radius: 18px;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             cursor: pointer;
-            transition: transform 0.2s, background 0.3s;
+            transition: all 0.3s ease;
             border: 2px solid transparent;
         }
 
-        .book-item:active {
-            transform: scale(0.98);
-        }
+        .book-item:active { transform: scale(0.97); }
 
         .book-item.completed {
-            background: #f0fff4;
+            background: #edfdf4;
             border-color: var(--success);
+            box-shadow: 0 5px 15px rgba(132, 250, 176, 0.3);
         }
 
-        .book-icon {
-            font-size: 2rem;
-            margin-right: 15px;
-        }
-
-        .book-text {
-            flex-grow: 1;
-            text-align: left;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
+        .book-icon { font-size: 2rem; margin-right: 15px; }
+        .book-text { flex-grow: 1; text-align: left; font-size: 1.2rem; font-weight: 600; }
 
         .check-circle {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            border: 3px solid #ddd;
+            border: 3px solid #e0e0e0;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: white;
+            font-size: 1.2rem;
         }
 
         .book-item.completed .check-circle {
             background-color: var(--success);
             border-color: var(--success);
+            transform: scale(1.1) rotate(360deg);
         }
 
-        /* Sección del Premio */
-        .prize-section {
+        /* === MODAL DEL PREMIO (NUEVO) === */
+        /* El fondo oscuro que cubre toda la pantalla */
+        .prize-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0,0,0,0.6); /* Fondo semitransparente */
+            backdrop-filter: blur(8px); /* Efecto borroso en iPhone */
             display: none; /* Oculto por defecto */
-            margin-top: 30px;
-            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Encima de todo */
+            padding: 30px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .prize-section.visible {
-            display: block;
+        .prize-overlay.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* La tarjeta blanca dentro del modal */
+        .prize-card {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .prize-overlay.visible .prize-card {
+            transform: scale(1); /* Animación de entrada pop */
         }
 
         .prize-img {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.3);
+            width: 90%;
+            max-width: 280px;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(255, 154, 158, 0.4);
             border: 4px solid #fff;
-            margin-bottom: 15px;
+            margin: 20px 0;
         }
 
-        .congrats-text {
+        .congrats-title {
             color: #FF6B6B;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            margin: 0;
         }
+
+        .congrats-text { font-size: 1.2rem; color: var(--text); }
 
         /* Botón Reset */
         .reset-btn {
-            margin-top: 50px;
-            background: none;
-            border: 2px solid #ddd;
+            margin-top: 15px;
+            background: white;
+            border: 2px solid #eee;
             color: #aaa;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 24px;
+            border-radius: 25px;
             font-family: inherit;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 0.9rem;
+            transition: all 0.2s;
         }
         
-        .reset-btn:hover {
-            border-color: #ff6b6b;
-            color: #ff6b6b;
-        }
-
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+        .reset-btn:hover, .reset-btn:active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: #fff5f5;
         }
 
     </style>
@@ -220,73 +237,76 @@
         <div class="book-list">
             <div class="book-item" onclick="toggleBook(0)">
                 <span class="book-icon">📕</span>
-                <span class="book-text">Libro 1</span>
+                <span class="book-text">Primer Libro</span>
                 <div class="check-circle" id="check0"></div>
             </div>
             <div class="book-item" onclick="toggleBook(1)">
                 <span class="book-icon">📗</span>
-                <span class="book-text">Libro 2</span>
+                <span class="book-text">Segundo Libro</span>
                 <div class="check-circle" id="check1"></div>
             </div>
             <div class="book-item" onclick="toggleBook(2)">
                 <span class="book-icon">📘</span>
-                <span class="book-text">Libro 3</span>
+                <span class="book-text">Tercer Libro</span>
                 <div class="check-circle" id="check2"></div>
             </div>
         </div>
-
-        <div class="prize-section" id="prizeSection">
-            <div class="congrats-text">🎉 ¡FELICIDADES! 🎉</div>
-            <p>¡Te ganaste tu iPhone 12!</p>
-            <img src="premio.jpg" alt="iPhone 12" class="prize-img" onerror="this.src='https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-purple-select-2021?wid=470&hei=556&fmt=jpeg&qlt=95&.v=1617130317654'">
-        </div>
-
-        <button class="reset-btn" onclick="resetProgress()">Reiniciar Reto</button>
+        
+        <button class="reset-btn" style="margin-top: 40px; font-size: 0.8rem; padding: 8px 16px;" onclick="confirmReset()">Reiniciar progreso</button>
     </div>
 
-    <script>
-        // Estado inicial
-        let books = [false, false, false];
 
-        // Al cargar la página
+    <div class="prize-overlay" id="prizeOverlay">
+        <div class="prize-card">
+            <h2 class="congrats-title">🎉 ¡FELICIDADES! 🎉</h2>
+            <p class="congrats-text">¡Lo lograste! Aquí está tu premio:</p>
+            
+            <img src="premio.jpg" alt="iPhone 12 Premio" class="prize-img" onerror="this.src='https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-purple-select-2021?wid=470&hei=556&fmt=jpeg&qlt=95&.v=1617130317654'">
+            
+            <br>
+            <button class="reset-btn" onclick="resetProgress()">¡Empezar nuevo reto!</button>
+        </div>
+    </div>
+
+
+    <script>
+        let books = [false, false, false];
+        const prizeOverlay = document.getElementById('prizeOverlay');
+
         document.addEventListener('DOMContentLoaded', () => {
             loadState();
-            updateUI();
+            // Si ya estaba completo al cargar, mostrar el premio directamente
+            if(books.filter(b => b).length === 3) {
+                 prizeOverlay.classList.add('visible');
+            }
+            updateUI(false); // false = no animar confeti al cargar
         });
 
         function toggleBook(index) {
-            // Cambiar estado
+            if(prizeOverlay.classList.contains('visible')) return; // No permitir cambios si ya ganó
+
             books[index] = !books[index];
             saveState();
-            updateUI();
-            
-            // Animación pequeña si se marca
-            if(books[index]) {
-                confetti({
-                    particleCount: 30,
-                    spread: 50,
-                    origin: { y: 0.7 },
-                    colors: ['#84FAB0', '#8FD3F4']
-                });
-            }
+            updateUI(books[index]); // true = animar confeti pequeño si se marca
         }
 
-        function updateUI() {
-            // Actualizar lista visual
+        function updateUI(shouldAnimateSmall) {
+            // 1. Actualizar lista visual
             books.forEach((isRead, index) => {
                 const item = document.querySelectorAll('.book-item')[index];
                 const check = document.getElementById(`check${index}`);
                 
                 if (isRead) {
                     item.classList.add('completed');
-                    check.innerHTML = '✔';
+                    // Pequeño delay para el tick para que se vea la animación del círculo primero
+                    setTimeout(() => { check.innerHTML = '✓'; }, 100);
                 } else {
                     item.classList.remove('completed');
                     check.innerHTML = '';
                 }
             });
 
-            // Actualizar Barra de Progreso
+            // 2. Actualizar Barra de Progreso
             const readCount = books.filter(b => b).length;
             const percentage = (readCount / 3) * 100;
             const progressBar = document.getElementById('progressBar');
@@ -294,63 +314,37 @@
             progressBar.style.width = percentage + '%';
             progressBar.innerText = readCount > 0 ? Math.round(percentage) + '%' : '';
 
-            // Verificar si ganó
-            const prizeSection = document.getElementById('prizeSection');
-            if (readCount === 3) {
-                if (!prizeSection.classList.contains('visible')) {
-                    celebrate();
-                }
-                prizeSection.classList.add('visible');
-            } else {
-                prizeSection.classList.remove('visible');
+            // 3. Animación pequeña al marcar uno
+            if (shouldAnimateSmall) {
+                confetti({ particleCount: 30, spread: 60, origin: { y: 0.7 }, colors: ['#84FAB0', '#8FD3F4'], zIndex: 1500 });
+            }
+
+            // 4. Verificar si ganó (Mostrar Modal)
+            if (readCount === 3 && !prizeOverlay.classList.contains('visible')) {
+                setTimeout(() => {
+                    celebrateBig();
+                    prizeOverlay.classList.add('visible');
+                }, 500); // Pequeño retraso para que disfrute el tercer tick
             }
         }
 
-        function celebrate() {
-            // Confeti explosivo
+        function celebrateBig() {
+            // Confeti explosivo que dura más y tiene mayor z-index
             var duration = 3000;
             var end = Date.now() + duration;
 
             (function frame() {
-                confetti({
-                    particleCount: 5,
-                    angle: 60,
-                    spread: 55,
-                    origin: { x: 0 },
-                    colors: ['#FF9A9E', '#FECFEF', '#A18CD1']
-                });
-                confetti({
-                    particleCount: 5,
-                    angle: 120,
-                    spread: 55,
-                    origin: { x: 1 },
-                    colors: ['#FF9A9E', '#FECFEF', '#A18CD1']
-                });
-
-                if (Date.now() < end) {
-                    requestAnimationFrame(frame);
-                }
+                confetti({ particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FF9A9E', '#FECFEF', '#A18CD1'], zIndex: 3000 });
+                confetti({ particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FF9A9E', '#FECFEF', '#A18CD1'], zIndex: 3000 });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
             }());
         }
 
         function saveState() {
-            localStorage.setItem('readingChallenge2024', JSON.stringify(books));
+            localStorage.setItem('readingChallengeData', JSON.stringify(books));
         }
 
         function loadState() {
-            const saved = localStorage.getItem('readingChallenge2024');
-            if (saved) {
-                books = JSON.parse(saved);
-            }
+            const saved = localStorage.getItem('readingChallengeData');
+            if (saved) { books = JSON.parse(saved); }
         }
-
-        function resetProgress() {
-            if(confirm('¿Seguro quieres reiniciar el reto? Se borrará el avance.')) {
-                books = [false, false, false];
-                saveState();
-                updateUI();
-            }
-        }
-    </script>
-</body>
-</html>
