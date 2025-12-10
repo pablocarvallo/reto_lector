@@ -26,7 +26,7 @@
         * {
             box-sizing: border-box;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            -webkit-tap-highlight-color: transparent; /* Quita el parpadeo azul en Android/Chrome */
         }
 
         body {
@@ -38,12 +38,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Centrado vertical en pantalla grande */
+            justify-content: center;
             color: var(--text);
             overflow-x: hidden;
         }
 
-        /* Contenedor Principal */
         .app-container {
             width: 100%;
             max-width: 450px;
@@ -53,21 +52,13 @@
             padding: 30px 25px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             text-align: center;
+            z-index: 10; /* Asegura que esté al frente */
+            position: relative;
         }
 
-        h1 {
-            color: var(--accent);
-            font-size: 2rem;
-            margin: 0 0 10px 0;
-        }
+        h1 { color: var(--accent); margin: 0 0 10px 0; font-size: 2rem; }
+        p.subtitle { margin-bottom: 30px; color: #888; }
 
-        p.subtitle {
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            color: #888;
-        }
-
-        /* Barra de Progreso */
         .progress-container {
             background-color: #eee;
             border-radius: 20px;
@@ -76,14 +67,13 @@
             margin-bottom: 35px;
             overflow: hidden;
             border: 3px solid #fff;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.08);
         }
 
         .progress-bar {
             background: linear-gradient(90deg, #fad0c4 0%, #ffd1ff 100%);
             height: 100%;
             width: 0%;
-            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efecto rebote */
+            transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -91,14 +81,14 @@
             color: #fff;
             font-weight: 700;
             font-size: 0.9rem;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
-        /* Lista de Libros */
         .book-list {
             display: flex;
             flex-direction: column;
             gap: 18px;
+            position: relative;
+            z-index: 20; /* Crítico: poner encima de todo para recibir clicks */
         }
 
         .book-item {
@@ -109,21 +99,21 @@
             align-items: center;
             justify-content: space-between;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            cursor: pointer; /* Importante para iOS */
+            transition: transform 0.2s, background 0.3s;
             border: 2px solid transparent;
+            position: relative;
         }
 
-        .book-item:active { transform: scale(0.97); }
+        .book-item:active { transform: scale(0.96); }
 
         .book-item.completed {
             background: #edfdf4;
             border-color: var(--success);
-            box-shadow: 0 5px 15px rgba(132, 250, 176, 0.3);
         }
 
-        .book-icon { font-size: 2rem; margin-right: 15px; }
-        .book-text { flex-grow: 1; text-align: left; font-size: 1.2rem; font-weight: 600; }
+        .book-icon { font-size: 2rem; margin-right: 15px; pointer-events: none; }
+        .book-text { flex-grow: 1; text-align: left; font-size: 1.2rem; font-weight: 600; pointer-events: none; }
 
         .check-circle {
             width: 32px;
@@ -133,32 +123,30 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.3s;
             color: white;
             font-size: 1.2rem;
+            pointer-events: none; /* Dejamos que el click lo reciba el .book-item */
         }
 
         .book-item.completed .check-circle {
             background-color: var(--success);
             border-color: var(--success);
-            transform: scale(1.1) rotate(360deg);
         }
 
-        /* === MODAL DEL PREMIO (NUEVO) === */
-        /* El fondo oscuro que cubre toda la pantalla */
+        /* MODAL */
         .prize-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(0,0,0,0.6); /* Fondo semitransparente */
-            backdrop-filter: blur(8px); /* Efecto borroso en iPhone */
-            display: none; /* Oculto por defecto */
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            display: none; /* Oculto completamente para no bloquear clicks */
             justify-content: center;
             align-items: center;
-            z-index: 2000; /* Encima de todo */
-            padding: 30px;
+            z-index: 3000;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -168,60 +156,37 @@
             opacity: 1;
         }
 
-        /* La tarjeta blanca dentro del modal */
         .prize-card {
             background: white;
-            padding: 35px 25px;
+            padding: 30px;
             border-radius: 30px;
             text-align: center;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 90%;
             transform: scale(0.8);
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .prize-overlay.visible .prize-card {
-            transform: scale(1); /* Animación de entrada pop */
-        }
+        .prize-overlay.visible .prize-card { transform: scale(1); }
 
         .prize-img {
-            width: 90%;
-            max-width: 280px;
-            border-radius: 25px;
-            box-shadow: 0 15px 30px rgba(255, 154, 158, 0.4);
-            border: 4px solid #fff;
+            width: 100%;
+            max-width: 250px;
+            border-radius: 20px;
             margin: 20px 0;
+            border: 4px solid #fff;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.3);
         }
 
-        .congrats-title {
-            color: #FF6B6B;
-            font-size: 1.8rem;
-            margin: 0;
-        }
-
-        .congrats-text { font-size: 1.2rem; color: var(--text); }
-
-        /* Botón Reset */
         .reset-btn {
-            margin-top: 15px;
-            background: white;
-            border: 2px solid #eee;
-            color: #aaa;
-            padding: 10px 24px;
-            border-radius: 25px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            color: #999;
+            padding: 10px 20px;
+            border-radius: 20px;
             font-family: inherit;
-            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            margin-top: 10px;
         }
-        
-        .reset-btn:hover, .reset-btn:active {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: #fff5f5;
-        }
-
     </style>
 </head>
 <body>
@@ -235,116 +200,148 @@
         </div>
 
         <div class="book-list">
-            <div class="book-item" onclick="toggleBook(0)">
+            <div class="book-item" id="book-0">
                 <span class="book-icon">📕</span>
                 <span class="book-text">Primer Libro</span>
                 <div class="check-circle" id="check0"></div>
             </div>
-            <div class="book-item" onclick="toggleBook(1)">
+            <div class="book-item" id="book-1">
                 <span class="book-icon">📗</span>
                 <span class="book-text">Segundo Libro</span>
                 <div class="check-circle" id="check1"></div>
             </div>
-            <div class="book-item" onclick="toggleBook(2)">
+            <div class="book-item" id="book-2">
                 <span class="book-icon">📘</span>
                 <span class="book-text">Tercer Libro</span>
                 <div class="check-circle" id="check2"></div>
             </div>
         </div>
-        
-        <button class="reset-btn" style="margin-top: 40px; font-size: 0.8rem; padding: 8px 16px;" onclick="confirmReset()">Reiniciar progreso</button>
-    </div>
 
+        <button class="reset-btn" style="margin-top: 40px; font-size: 0.8rem;" id="btn-reset-small">Reiniciar</button>
+    </div>
 
     <div class="prize-overlay" id="prizeOverlay">
         <div class="prize-card">
-            <h2 class="congrats-title">🎉 ¡FELICIDADES! 🎉</h2>
-            <p class="congrats-text">¡Lo lograste! Aquí está tu premio:</p>
-            
-            <img src="premio.jpg" alt="iPhone 12 Premio" class="prize-img" onerror="this.src='https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-purple-select-2021?wid=470&hei=556&fmt=jpeg&qlt=95&.v=1617130317654'">
-            
+            <h2 style="color: #FF6B6B; margin:0;">🎉 ¡FELICIDADES! 🎉</h2>
+            <p>¡Lo lograste! Aquí está tu premio:</p>
+            <img src="premio.jpg" alt="Premio" class="prize-img" onerror="this.src='https://store.storeimages.cdn-apple.com/4668/as-images.apple.com/is/iphone-12-purple-select-2021?wid=470&hei=556&fmt=jpeg&qlt=95&.v=1617130317654'">
             <br>
-            <button class="reset-btn" onclick="resetProgress()">¡Empezar nuevo reto!</button>
+            <button class="reset-btn" id="btn-reset-big" style="background: #FF9A9E; color: white; border: none;">¡Empezar de nuevo!</button>
         </div>
     </div>
 
-
     <script>
+        // === LÓGICA JAVASCRIPT SEGURA ===
+        
         let books = [false, false, false];
         const prizeOverlay = document.getElementById('prizeOverlay');
 
+        // Función segura para lanzar confeti (si no carga, no rompe la app)
+        function safeConfetti(opts) {
+            if (typeof confetti === 'function') {
+                confetti(opts);
+            } else {
+                console.log("Confetti no cargado, pero la app sigue funcionando.");
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadState();
-            // Si ya estaba completo al cargar, mostrar el premio directamente
-            if(books.filter(b => b).length === 3) {
-                 prizeOverlay.classList.add('visible');
-            }
-            updateUI(false); // false = no animar confeti al cargar
+            setupEventListeners(); // Configuramos los clics aquí
+            updateUI(false);
         });
 
+        function setupEventListeners() {
+            // Asignar eventos de click manualmente para mayor compatibilidad
+            document.getElementById('book-0').addEventListener('click', () => toggleBook(0));
+            document.getElementById('book-1').addEventListener('click', () => toggleBook(1));
+            document.getElementById('book-2').addEventListener('click', () => toggleBook(2));
+            
+            document.getElementById('btn-reset-small').addEventListener('click', confirmReset);
+            document.getElementById('btn-reset-big').addEventListener('click', resetProgress);
+        }
+
         function toggleBook(index) {
-            if(prizeOverlay.classList.contains('visible')) return; // No permitir cambios si ya ganó
+            // Si el premio está visible, no dejamos desmarcar libros haciendo click en el fondo
+            if(prizeOverlay.classList.contains('visible')) return;
 
             books[index] = !books[index];
             saveState();
-            updateUI(books[index]); // true = animar confeti pequeño si se marca
+            updateUI(books[index]); // true = intentar animar confeti
         }
 
-        function updateUI(shouldAnimateSmall) {
-            // 1. Actualizar lista visual
+        function updateUI(shouldAnimate) {
+            // Actualizar lista
             books.forEach((isRead, index) => {
-                const item = document.querySelectorAll('.book-item')[index];
+                const item = document.getElementById(`book-${index}`);
                 const check = document.getElementById(`check${index}`);
                 
                 if (isRead) {
                     item.classList.add('completed');
-                    // Pequeño delay para el tick para que se vea la animación del círculo primero
-                    setTimeout(() => { check.innerHTML = '✓'; }, 100);
+                    check.innerHTML = '✓';
                 } else {
                     item.classList.remove('completed');
                     check.innerHTML = '';
                 }
             });
 
-            // 2. Actualizar Barra de Progreso
+            // Actualizar barra
             const readCount = books.filter(b => b).length;
             const percentage = (readCount / 3) * 100;
             const progressBar = document.getElementById('progressBar');
-            
             progressBar.style.width = percentage + '%';
             progressBar.innerText = readCount > 0 ? Math.round(percentage) + '%' : '';
 
-            // 3. Animación pequeña al marcar uno
-            if (shouldAnimateSmall) {
-                confetti({ particleCount: 30, spread: 60, origin: { y: 0.7 }, colors: ['#84FAB0', '#8FD3F4'], zIndex: 1500 });
+            // Animación pequeña
+            if (shouldAnimate) {
+                safeConfetti({ particleCount: 30, spread: 60, origin: { y: 0.7 }, colors: ['#84FAB0', '#8FD3F4'], zIndex: 2000 });
             }
 
-            // 4. Verificar si ganó (Mostrar Modal)
+            // Verificar Ganador
             if (readCount === 3 && !prizeOverlay.classList.contains('visible')) {
                 setTimeout(() => {
                     celebrateBig();
                     prizeOverlay.classList.add('visible');
-                }, 500); // Pequeño retraso para que disfrute el tercer tick
+                }, 300);
             }
         }
 
         function celebrateBig() {
-            // Confeti explosivo que dura más y tiene mayor z-index
             var duration = 3000;
             var end = Date.now() + duration;
 
             (function frame() {
-                confetti({ particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FF9A9E', '#FECFEF', '#A18CD1'], zIndex: 3000 });
-                confetti({ particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FF9A9E', '#FECFEF', '#A18CD1'], zIndex: 3000 });
+                safeConfetti({ particleCount: 7, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#FF9A9E', '#FECFEF', '#A18CD1'], zIndex: 4000 });
+                safeConfetti({ particleCount: 7, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#FF9A9E', '#FECFEF', '#A18CD1'], zIndex: 4000 });
                 if (Date.now() < end) { requestAnimationFrame(frame); }
             }());
         }
 
         function saveState() {
-            localStorage.setItem('readingChallengeData', JSON.stringify(books));
+            localStorage.setItem('readingChallengeData_v2', JSON.stringify(books));
         }
 
         function loadState() {
-            const saved = localStorage.getItem('readingChallengeData');
+            const saved = localStorage.getItem('readingChallengeData_v2');
             if (saved) { books = JSON.parse(saved); }
+            
+            // Si cargamos y ya ganó, mostrar premio directo
+            if(books.filter(b => b).length === 3) {
+                prizeOverlay.classList.add('visible');
+            }
         }
+
+        function confirmReset() {
+            if(confirm('¿Borrar progreso?')) resetProgress();
+        }
+
+        function resetProgress() {
+            books = [false, false, false];
+            saveState();
+            prizeOverlay.classList.remove('visible');
+            updateUI(false);
+            if (typeof confetti === 'function') confetti.reset();
+        }
+    </script>
+</body>
+</html>
